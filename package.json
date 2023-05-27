@@ -25,5 +25,11 @@
 		"vite": "^4.3.0",
 		"vitest": "^0.25.3"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@types/lodash-es": "^4.17.7",
+		"ag-grid-community": "^29.3.5",
+		"lodash-es": "^4.17.21",
+		"mathjs": "^11.8.0"
+	}
 }
