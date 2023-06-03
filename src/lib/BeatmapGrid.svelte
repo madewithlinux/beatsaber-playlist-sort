@@ -8,22 +8,32 @@
 </script>
 
 <script lang="ts">
-	import type { GridApi, ColDef, ColumnApi, GridOptions } from 'ag-grid-community';
+	import type { ColDef, ColumnApi, GridApi, GridOptions } from 'ag-grid-community';
 	import 'ag-grid-community/styles/ag-grid.css';
 	import 'ag-grid-community/styles/ag-theme-balham.css';
 	import AgGridSvelte from 'ag-grid-svelte';
-	import { formatFixedDecimal, formatPercentage, songLinkCellRenderer } from './grid_util';
+	import { formatFixedDecimal, formatPercentage, songNameCellRenderer } from './grid_util';
 
 	export let rowData: BeatmapGridRow[];
 
-	const columnDefs: ColDef[] = [
+	//////// display options
+	let songCoverImageEnabled = true;
+
+	//////// grid config
+	let columnDefs: ColDef[];
+	$: columnDefs = [
 		{
 			headerName: 'weight',
 			field: 'sortWeight',
 			type: 'numericColumn',
 			valueFormatter: formatFixedDecimal(3),
 		},
-		{ headerName: 'name', field: 'leaderboardInfo.song.name', cellRenderer: songLinkCellRenderer },
+		{
+			headerName: 'name',
+			field: 'leaderboardInfo.song.name',
+			// cellRenderer: songNameCellRenderer({ showCoverImage: true }),
+			cellRenderer: songNameCellRenderer({ showCoverImage: songCoverImageEnabled }),
+		},
 		{ headerName: 'diff', field: 'leaderboardInfo.difficulty.difficultyName' },
 		{
 			headerName: 'nps',
@@ -106,6 +116,10 @@
 <div class="container">
 	<div class="gridButtons">
 		<button on:click={() => columnApi.autoSizeAllColumns()}>autoSizeAllColumns</button>
+		<label>
+			<input type="checkbox" bind:checked={songCoverImageEnabled} />
+			show song cover images?
+		</label>
 	</div>
 	<div class="AgGridSvelte-theme-container ag-grid ag-theme-balham">
 		<AgGridSvelte
@@ -120,6 +134,16 @@
 </div>
 
 <style>
+	div.container :global(.song-name-cell) {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 5px;
+	}
+	div.container :global(.cover-image) {
+		height: 24px;
+	}
+
 	div.container {
 		flex-grow: 1;
 		display: flex;
@@ -127,6 +151,8 @@
 	}
 	div.gridButtons {
 		padding: 10px;
+		display: flex;
+		gap: 10px;
 	}
 	.AgGridSvelte-theme-container {
 		flex-grow: 1;

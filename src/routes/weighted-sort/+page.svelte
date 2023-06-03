@@ -2,10 +2,7 @@
 	import { page } from '$app/stores';
 	import type { BeatmapGridRow } from '$lib/BeatmapGrid.svelte';
 	import BeatmapGrid from '$lib/BeatmapGrid.svelte';
-	import type {
-		LeaderboardInfoResponse,
-		LeaderboardInfoResponseResponseWithMetadata,
-	} from '../../beatleader';
+	import type { LeaderboardInfoResponse, LeaderboardInfoResponseResponseWithMetadata } from '../../beatleader';
 
 	const leaderboard_info_response: LeaderboardInfoResponseResponseWithMetadata = $page.data.item;
 	const maps: LeaderboardInfoResponse[] = leaderboard_info_response.data!;
@@ -35,6 +32,8 @@
 		}))
 		// sort it in the reverse
 		.sort((a, b) => b.sortWeight - a.sortWeight);
+
+	// console.log(weight_sorted_maps[0]);
 </script>
 
 <div class="container">
