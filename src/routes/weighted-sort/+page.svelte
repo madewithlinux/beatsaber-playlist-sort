@@ -2,44 +2,42 @@
 	import { page } from '$app/stores';
 	import type { BeatmapGridRow } from '$lib/BeatmapGrid.svelte';
 	import BeatmapGrid from '$lib/BeatmapGrid.svelte';
+	import SortWeightFuncChecker from '$lib/SortWeightFuncChecker.svelte';
+	import { build_sort_weight_func } from '$lib/sort_weight_calc';
+	import type { BeatmapSortWeightFunc } from '$lib/sort_weight_calc';
 	import type { LeaderboardInfoResponse, LeaderboardInfoResponseResponseWithMetadata } from '../../beatleader';
 
 	const leaderboard_info_response: LeaderboardInfoResponseResponseWithMetadata = $page.data.item;
 	const maps: LeaderboardInfoResponse[] = leaderboard_info_response.data!;
 
-	// TODO: abstract this out
-	const compute_leaderboard_entry_rank = (lb: LeaderboardInfoResponse) => {
-		const difficulty = lb.difficulty!;
-		const nps = difficulty.nps!;
-		const njs = difficulty.njs!;
-		const stars = difficulty.stars!;
-		const predictedAcc = difficulty.predictedAcc!;
-		const passRating = difficulty.passRating!;
-		const accRating = difficulty.accRating!;
-		const techRating = difficulty.techRating!;
-		if (njs >= 11) {
-			return techRating / nps;
-		} else {
-			return techRating / nps / 10;
+	// let sort_weight_expression = 'techRating / nps - sq(njs-15)/10';
+	let sort_weight_expression = 'stars/nps + techStars/nps - sq(njs-15)/10';
+	let sort_weight_func: BeatmapSortWeightFunc = () => 0.0;
+	$: {
+		const res = build_sort_weight_func(sort_weight_expression);
+		if (res !== false) {
+			sort_weight_func = res;
 		}
-		// return techRating / nps;
-	};
+	}
 
-	const weight_sorted_maps: BeatmapGridRow[] = [...maps]
+	let weight_sorted_maps: BeatmapGridRow[];
+	$: weight_sorted_maps = [...maps]
 		.map((leaderboardInfo) => ({
-			sortWeight: compute_leaderboard_entry_rank(leaderboardInfo),
+			sortWeight: sort_weight_func(leaderboardInfo),
 			leaderboardInfo,
 		}))
 		// sort it in the reverse
 		.sort((a, b) => b.sortWeight - a.sortWeight);
-
-	// console.log(weight_sorted_maps[0]);
 </script>
 
 <div class="container">
 	<div class="header">
 		<h1>beatleader playlist sort</h1>
-		<h1>{leaderboard_info_response.data?.length}</h1>
+		<div class="sort-weight-expression">
+			<label for="sort-weight-expression"> sort weight expression: </label>
+			<input id="sort-weight-expression" class="wide" bind:value={sort_weight_expression} />
+			<SortWeightFuncChecker {sort_weight_expression} map={maps[0]} />
+		</div>
 	</div>
 	<div class="content">
 		<BeatmapGrid rowData={weight_sorted_maps} />
@@ -57,7 +55,14 @@
 		flex-direction: column;
 	}
 	div.header {
-		padding: 10px;
+		padding: 5px;
+	}
+	.sort-weight-expression {
+		display: flex;
+		gap: 5px;
+	}
+	.sort-weight-expression input {
+		flex-grow: 1;
 	}
 	div.content {
 		flex-grow: 1;
