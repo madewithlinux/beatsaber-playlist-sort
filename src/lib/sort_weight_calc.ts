@@ -28,6 +28,10 @@ export const build_sort_weight_func = (expression: string, failOnError?: boolean
 				passStars: difficulty?.passRating ?? 0,
 				accStars: difficulty?.accRating ?? 0,
 				techStars: difficulty?.techRating ?? 0,
+				notes: difficulty?.notes ?? 0,
+				bombs: difficulty?.bombs ?? 0,
+				walls: difficulty?.walls ?? 0,
+				duration: difficulty?.duration ?? 0,
 			};
 			if (failOnError) {
 				return mathjsFunc.evaluate(scope);

@@ -31,10 +31,10 @@
 		{
 			headerName: 'name',
 			field: 'leaderboardInfo.song.name',
-			// cellRenderer: songNameCellRenderer({ showCoverImage: true }),
 			cellRenderer: songNameCellRenderer({ showCoverImage: songCoverImageEnabled }),
 		},
 		{ headerName: 'diff', field: 'leaderboardInfo.difficulty.difficultyName' },
+		{ headerName: 'mode', field: 'leaderboardInfo.difficulty.modeName', hide: true },
 		{
 			headerName: 'nps',
 			field: 'leaderboardInfo.difficulty.nps',
@@ -42,21 +42,19 @@
 			valueFormatter: formatFixedDecimal(2),
 		},
 		{ headerName: 'njs', field: 'leaderboardInfo.difficulty.njs', type: 'numericColumn' },
-		{ headerName: 'notes', field: 'leaderboardInfo.difficulty.notes', type: 'numericColumn' },
-		{ headerName: 'bombs', field: 'leaderboardInfo.difficulty.bombs', type: 'numericColumn' },
-		{ headerName: 'walls', field: 'leaderboardInfo.difficulty.walls', type: 'numericColumn' },
+		{ headerName: 'duration', field: 'leaderboardInfo.difficulty.duration', type: 'numericColumn' },
 		{
 			headerName: 'maxScore',
 			field: 'leaderboardInfo.difficulty.maxScore',
 			type: 'numericColumn',
 			hide: true,
 		},
-		{ headerName: 'duration', field: 'leaderboardInfo.difficulty.duration', type: 'numericColumn' },
 		{
 			headerName: 'predictedAcc',
 			field: 'leaderboardInfo.difficulty.predictedAcc',
 			type: 'numericColumn',
 			valueFormatter: formatPercentage,
+			hide: true,
 		},
 		{
 			headerName: '★stars★',
@@ -82,6 +80,9 @@
 			type: 'numericColumn',
 			valueFormatter: formatFixedDecimal(2),
 		},
+		{ headerName: 'notes', field: 'leaderboardInfo.difficulty.notes', type: 'numericColumn' },
+		{ headerName: 'bombs', field: 'leaderboardInfo.difficulty.bombs', type: 'numericColumn' },
+		{ headerName: 'walls', field: 'leaderboardInfo.difficulty.walls', type: 'numericColumn' },
 		{
 			headerName: 'uploadTime',
 			field: 'leaderboardInfo.song.uploadTime',
@@ -116,6 +117,7 @@
 <div class="container">
 	<div class="gridButtons">
 		<button on:click={() => columnApi.autoSizeAllColumns()}>autoSizeAllColumns</button>
+		<button on:click={() => api.sizeColumnsToFit()}>sizeColumnsToFit</button>
 		<label>
 			<input type="checkbox" bind:checked={songCoverImageEnabled} />
 			show song cover images?

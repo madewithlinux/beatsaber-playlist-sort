@@ -3,6 +3,7 @@
 	import type { BeatmapGridRow } from '$lib/BeatmapGrid.svelte';
 	import BeatmapGrid from '$lib/BeatmapGrid.svelte';
 	import SortWeightFuncChecker from '$lib/SortWeightFuncChecker.svelte';
+	import { generatePlaylistDataURI } from '$lib/generate_playlist';
 	import { build_sort_weight_func } from '$lib/sort_weight_calc';
 	import type { BeatmapSortWeightFunc } from '$lib/sort_weight_calc';
 	import type { LeaderboardInfoResponse, LeaderboardInfoResponseResponseWithMetadata } from '../../beatleader';
@@ -12,6 +13,9 @@
 
 	// let sort_weight_expression = 'techRating / nps - sq(njs-15)/10';
 	let sort_weight_expression = 'stars/nps + techStars/nps - sq(njs-15)/10';
+	let playlist_size = 100;
+	let playlist_title = 'weighted tech';
+	let playlist_author = 'Luna';
 	let sort_weight_func: BeatmapSortWeightFunc = () => 0.0;
 	$: {
 		const res = build_sort_weight_func(sort_weight_expression);
@@ -28,15 +32,36 @@
 		}))
 		// sort it in the reverse
 		.sort((a, b) => b.sortWeight - a.sortWeight);
+
+	$: playlistDataURI = generatePlaylistDataURI(
+		weight_sorted_maps.slice(0, playlist_size).map((b) => b.leaderboardInfo),
+		playlist_title,
+		playlist_author,
+	);
 </script>
 
 <div class="container">
 	<div class="header">
 		<h1>beatleader playlist sort</h1>
-		<div class="sort-weight-expression">
+		<div class="row">
 			<label for="sort-weight-expression"> sort weight expression: </label>
 			<input id="sort-weight-expression" class="wide" bind:value={sort_weight_expression} />
 			<SortWeightFuncChecker {sort_weight_expression} map={maps[0]} />
+		</div>
+		<div class="row">
+			<label>
+				playlist size:
+				<input type="number" bind:value={playlist_size} />
+			</label>
+			<label>
+				playlist title:
+				<input bind:value={playlist_title} />
+			</label>
+			<label>
+				playlist author:
+				<input bind:value={playlist_author} />
+			</label>
+			<a href={playlistDataURI} download="{playlist_title}.json"> click to download playlist </a>
 		</div>
 	</div>
 	<div class="content">
@@ -56,12 +81,15 @@
 	}
 	div.header {
 		padding: 5px;
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
 	}
-	.sort-weight-expression {
+	.row {
 		display: flex;
 		gap: 5px;
 	}
-	.sort-weight-expression input {
+	.row input {
 		flex-grow: 1;
 	}
 	div.content {
