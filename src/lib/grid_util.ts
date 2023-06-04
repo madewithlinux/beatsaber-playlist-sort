@@ -21,6 +21,16 @@ export const songNameCellRenderer: (config: SongNameCellRendererConfig) => ICell
 		return `<div class="song-name-cell">${img}<a target="_blank" rel="noopener noreferrer" href="${leaderboardUrl}">${songName}</a></div>`;
 	};
 
+export const mapperNameCellRenderer: ICellRendererFunc<BeatmapGridRow> = (params) => {
+	if (isNil(params.data)) {
+		return '';
+	}
+	const data: BeatmapGridRow = params.data;
+	const mapperName = data.leaderboardInfo.song?.mapper ?? '';
+	const mapperUrl = `https://beatsaver.com/profile/${data.leaderboardInfo.song?.mapperId}`;
+	return `<a target="_blank" rel="noopener noreferrer" href="${mapperUrl}">${mapperName}</a>`;
+};
+
 export const formatFixedDecimal: (digits: number) => ValueFormatterFunc<number> = (digits) => (params) => {
 	const numberFormat = new Intl.NumberFormat(undefined, {
 		minimumFractionDigits: digits,

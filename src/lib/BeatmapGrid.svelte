@@ -12,12 +12,13 @@
 	import 'ag-grid-community/styles/ag-grid.css';
 	import 'ag-grid-community/styles/ag-theme-balham.css';
 	import AgGridSvelte from 'ag-grid-svelte';
-	import { formatFixedDecimal, formatPercentage, songNameCellRenderer } from './grid_util';
+	import { formatFixedDecimal, formatPercentage, mapperNameCellRenderer, songNameCellRenderer } from './grid_util';
 
 	export let rowData: BeatmapGridRow[];
 
 	//////// display options
 	export let songCoverImageEnabled = true;
+	export let allColumns = false;
 
 	//////// grid config
 	let columnDefs: ColDef[];
@@ -33,8 +34,16 @@
 			field: 'leaderboardInfo.song.name',
 			cellRenderer: songNameCellRenderer({ showCoverImage: songCoverImageEnabled }),
 		},
+		{ headerName: 'artist', field: 'leaderboardInfo.song.author', hide: !allColumns },
+		{
+			headerName: 'mapper',
+			field: 'leaderboardInfo.song.mapper',
+			cellRenderer: mapperNameCellRenderer,
+			hide: !allColumns,
+		},
+		{ headerName: 'tags', field: 'leaderboardInfo.song.tags', hide: !allColumns },
 		{ headerName: 'diff', field: 'leaderboardInfo.difficulty.difficultyName' },
-		{ headerName: 'mode', field: 'leaderboardInfo.difficulty.modeName', hide: true },
+		{ headerName: 'mode', field: 'leaderboardInfo.difficulty.modeName', hide: !allColumns },
 		{
 			headerName: 'nps',
 			field: 'leaderboardInfo.difficulty.nps',
@@ -47,14 +56,14 @@
 			headerName: 'maxScore',
 			field: 'leaderboardInfo.difficulty.maxScore',
 			type: 'numericColumn',
-			hide: true,
+			hide: !allColumns,
 		},
 		{
 			headerName: 'predictedAcc',
 			field: 'leaderboardInfo.difficulty.predictedAcc',
 			type: 'numericColumn',
 			valueFormatter: formatPercentage,
-			hide: true,
+			hide: !allColumns,
 		},
 		{
 			headerName: '★stars★',
@@ -86,22 +95,22 @@
 		{
 			headerName: 'uploadTime',
 			field: 'leaderboardInfo.song.uploadTime',
-			hide: true,
+			hide: !allColumns,
 		},
 		{
 			headerName: 'nominatedTime',
 			field: 'leaderboardInfo.difficulty.nominatedTime',
-			hide: true,
+			hide: !allColumns,
 		},
 		{
 			headerName: 'qualifiedTime',
 			field: 'leaderboardInfo.difficulty.qualifiedTime',
-			hide: true,
+			hide: !allColumns,
 		},
 		{
 			headerName: 'rankedTime',
 			field: 'leaderboardInfo.difficulty.rankedTime',
-			hide: true,
+			hide: !allColumns,
 		},
 	];
 
@@ -116,14 +125,6 @@
 </script>
 
 <div class="container">
-	<!-- <div class="gridButtons">
-		<button on:click={() => columnApi?.autoSizeAllColumns()}>autoSizeAllColumns</button>
-		<button on:click={() => api?.sizeColumnsToFit()}>sizeColumnsToFit</button>
-		<label>
-			<input type="checkbox" bind:checked={songCoverImageEnabled} />
-			show song cover images?
-		</label>
-	</div> -->
 	<div class="AgGridSvelte-theme-container ag-grid ag-theme-balham">
 		<AgGridSvelte
 			{columnDefs}
@@ -131,7 +132,11 @@
 			bind:api
 			bind:columnApi
 			{gridOptions}
-			onGridReady={({ columnApi }) => columnApi.autoSizeAllColumns()}
+			onGridReady={({ columnApi }) => {
+				columnApi.autoSizeAllColumns();
+				// by default, don't make the song name super wide like that
+				columnApi.setColumnWidth('leaderboardInfo.song.name', 200);
+			}}
 		/>
 	</div>
 </div>
@@ -146,16 +151,10 @@
 	div.container :global(.cover-image) {
 		height: 24px;
 	}
-
 	div.container {
 		flex-grow: 1;
 		display: flex;
 		flex-direction: column;
-	}
-	div.gridButtons {
-		padding: 10px;
-		display: flex;
-		gap: 10px;
 	}
 	.AgGridSvelte-theme-container {
 		flex-grow: 1;

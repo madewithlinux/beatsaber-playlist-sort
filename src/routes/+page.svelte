@@ -44,6 +44,8 @@
 	let api: GridApi | undefined = undefined;
 	let columnApi: ColumnApi | undefined = undefined;
 	let songCoverImageEnabled = true;
+	let allColumns = false;
+	$: console.log(weight_sorted_maps[1]);
 </script>
 
 <div class="container">
@@ -76,10 +78,14 @@
 				<input type="checkbox" bind:checked={songCoverImageEnabled} />
 				show song cover images?
 			</label>
+			<label>
+				<input type="checkbox" bind:checked={allColumns} />
+				show all columns?
+			</label>
 		</div>
 	</div>
 	<div class="content">
-		<BeatmapGrid rowData={weight_sorted_maps} bind:api bind:columnApi bind:songCoverImageEnabled />
+		<BeatmapGrid rowData={weight_sorted_maps} bind:api bind:columnApi {songCoverImageEnabled} {allColumns} />
 	</div>
 </div>
 
