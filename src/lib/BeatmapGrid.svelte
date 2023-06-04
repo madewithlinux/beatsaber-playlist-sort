@@ -17,7 +17,7 @@
 	export let rowData: BeatmapGridRow[];
 
 	//////// display options
-	let songCoverImageEnabled = true;
+	export let songCoverImageEnabled = true;
 
 	//////// grid config
 	let columnDefs: ColDef[];
@@ -105,7 +105,8 @@
 		},
 	];
 
-	let api: GridApi, columnApi: ColumnApi;
+	export let api: GridApi | undefined = undefined;
+	export let columnApi: ColumnApi | undefined = undefined;
 	let gridOptions: GridOptions = {
 		defaultColDef: {
 			resizable: true,
@@ -115,14 +116,14 @@
 </script>
 
 <div class="container">
-	<div class="gridButtons">
-		<button on:click={() => columnApi.autoSizeAllColumns()}>autoSizeAllColumns</button>
-		<button on:click={() => api.sizeColumnsToFit()}>sizeColumnsToFit</button>
+	<!-- <div class="gridButtons">
+		<button on:click={() => columnApi?.autoSizeAllColumns()}>autoSizeAllColumns</button>
+		<button on:click={() => api?.sizeColumnsToFit()}>sizeColumnsToFit</button>
 		<label>
 			<input type="checkbox" bind:checked={songCoverImageEnabled} />
 			show song cover images?
 		</label>
-	</div>
+	</div> -->
 	<div class="AgGridSvelte-theme-container ag-grid ag-theme-balham">
 		<AgGridSvelte
 			{columnDefs}

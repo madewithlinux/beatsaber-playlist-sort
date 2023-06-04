@@ -2,42 +2,48 @@
 	import { page } from '$app/stores';
 	import type { BeatmapGridRow } from '$lib/BeatmapGrid.svelte';
 	import BeatmapGrid from '$lib/BeatmapGrid.svelte';
-	import SortWeightFuncChecker from '$lib/SortWeightFuncChecker.svelte';
+	import ErrorIndicator from '$lib/ErrorIndicator.svelte';
 	import { generatePlaylistDataURI } from '$lib/generate_playlist';
-	import { build_sort_weight_func } from '$lib/sort_weight_calc';
-	import type { BeatmapSortWeightFunc } from '$lib/sort_weight_calc';
+	import { batch_apply_sort_weight } from '$lib/sort_weight_calc';
+	import type { ColumnApi, GridApi } from 'ag-grid-community';
 	import type { LeaderboardInfoResponse, LeaderboardInfoResponseResponseWithMetadata } from '../beatleader';
 
 	const leaderboard_info_response: LeaderboardInfoResponseResponseWithMetadata = $page.data.item;
 	const maps: LeaderboardInfoResponse[] = leaderboard_info_response.data!;
 
-	// let sort_weight_expression = 'techRating / nps - sq(njs-15)/10';
+	// config variables
 	let sort_weight_expression = 'stars/nps + techStars/nps - sq(njs-15)/10';
 	let playlist_size = 100;
 	let playlist_title = 'weighted tech';
 	let playlist_author = 'Luna';
-	let sort_weight_func: BeatmapSortWeightFunc = () => 0.0;
+
+	// calculations
+	let weight_sorted_maps: BeatmapGridRow[];
+	let error: Error | undefined = undefined;
 	$: {
-		const res = build_sort_weight_func(sort_weight_expression);
-		if (res !== false) {
-			sort_weight_func = res;
+		try {
+			const weight_sorted_maps2 = batch_apply_sort_weight(sort_weight_expression, maps);
+			weight_sorted_maps = weight_sorted_maps2;
+			error = undefined;
+		} catch (e) {
+			if (e instanceof Error) {
+				error = e;
+			} else {
+				console.error(e);
+				error = new Error(`unknown error ${e}`);
+			}
 		}
 	}
-
-	let weight_sorted_maps: BeatmapGridRow[];
-	$: weight_sorted_maps = [...maps]
-		.map((leaderboardInfo) => ({
-			sortWeight: sort_weight_func(leaderboardInfo),
-			leaderboardInfo,
-		}))
-		// sort it in the reverse
-		.sort((a, b) => b.sortWeight - a.sortWeight);
-
 	$: playlistDataURI = generatePlaylistDataURI(
 		weight_sorted_maps.slice(0, playlist_size).map((b) => b.leaderboardInfo),
 		playlist_title,
 		playlist_author,
 	);
+
+	// stuff for the grid
+	let api: GridApi | undefined = undefined;
+	let columnApi: ColumnApi | undefined = undefined;
+	let songCoverImageEnabled = true;
 </script>
 
 <div class="container">
@@ -46,7 +52,7 @@
 		<div class="row">
 			<label for="sort-weight-expression"> sort weight expression: </label>
 			<input id="sort-weight-expression" class="wide" bind:value={sort_weight_expression} />
-			<SortWeightFuncChecker {sort_weight_expression} map={maps[0]} />
+			<ErrorIndicator {error} />
 		</div>
 		<div class="row">
 			<label>
@@ -63,14 +69,29 @@
 			</label>
 			<a href={playlistDataURI} download="{playlist_title}.json"> click to download playlist </a>
 		</div>
+		<div class="row">
+			<button on:click={() => columnApi?.autoSizeAllColumns()}>autoSizeAllColumns</button>
+			<button on:click={() => api?.sizeColumnsToFit()}>sizeColumnsToFit</button>
+			<label>
+				<input type="checkbox" bind:checked={songCoverImageEnabled} />
+				show song cover images?
+			</label>
+		</div>
 	</div>
 	<div class="content">
-		<BeatmapGrid rowData={weight_sorted_maps} />
+		<BeatmapGrid rowData={weight_sorted_maps} bind:api bind:columnApi bind:songCoverImageEnabled />
 	</div>
 </div>
 
 <style>
 	:global(body) {
+		margin: 0;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue',
+			sans-serif;
+		font-size: 1.2rem;
+		--gap: 0.5em;
+	}
+	h1 {
 		margin: 0;
 	}
 	div.container {
@@ -80,16 +101,22 @@
 		flex-direction: column;
 	}
 	div.header {
-		padding: 5px;
+		/* padding: 10px; */
+		/* padding: 1em; */
+		padding-left: 1em;
+		padding-right: 1em;
+		padding-top: var(--gap);
+		padding-bottom: var(--gap);
+		gap: var(--gap);
 		display: flex;
 		flex-direction: column;
-		gap: 5px;
+		/* gap: 5px; */
 	}
 	.row {
 		display: flex;
-		gap: 5px;
+		gap: var(--gap);
 	}
-	.row input {
+	.row .wide {
 		flex-grow: 1;
 	}
 	div.content {
