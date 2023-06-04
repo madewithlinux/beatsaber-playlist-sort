@@ -1,5 +1,5 @@
 // /** @type {import('./$types').PageLoad} */
-import type { LeaderboardInfoResponseResponseWithMetadata } from '../../beatleader';
+import type { LeaderboardInfoResponseResponseWithMetadata } from '../beatleader';
 import type { PageLoad } from './$types';
 
 export interface OutputData {
