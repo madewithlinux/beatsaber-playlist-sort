@@ -26,7 +26,6 @@ export const GET: RequestHandler = async ({ fetch, url }) => {
 		playlist_author,
 	);
 	playlistObject.customData = { syncURL: url.href };
-	playlistObject.songs = playlistObject.songs;
 
 	const response = json_stringify(playlistObject, {
 		// TODO: figure out how to explicitly set the key order without messing up the individual song JSONs
