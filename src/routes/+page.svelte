@@ -15,7 +15,7 @@
 
 	// config variables
 	let sort_weight_expression = $page.url.searchParams.get('expr') ?? 'stars/nps + techStars/nps - sq(njs-15)/10';
-	let playlist_size = Number($page.url.searchParams.get('size')) ?? 100;
+	let playlist_size = Number($page.url.searchParams.get('size') ?? 100);
 	let playlist_title = $page.url.searchParams.get('title') ?? 'weighted tech';
 	let playlist_author = $page.url.searchParams.get('author') ?? 'Luna';
 
