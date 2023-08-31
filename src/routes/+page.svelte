@@ -45,7 +45,7 @@
 	let columnApi: ColumnApi | undefined = undefined;
 	let songCoverImageEnabled = true;
 	let allColumns = false;
-	$: console.log(weight_sorted_maps[1]);
+	// $: console.log(weight_sorted_maps[1]);
 </script>
 
 <div class="container">
