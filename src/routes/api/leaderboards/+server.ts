@@ -2,9 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import type { LeaderboardInfoResponseResponseWithMetadata } from '../../../beatleader';
 
-export const GET: RequestHandler = async ({ url }) => {
-	// console.log('/api/leaderboards');
-	// console.log(url.searchParams.toString());
+export const GET: RequestHandler = async ({ fetch, url }) => {
 	const res = await fetch(`https://api.beatleader.xyz/leaderboards?${url.searchParams.toString()}`);
 	const item: LeaderboardInfoResponseResponseWithMetadata = await res.json();
 	const response = json(item);
