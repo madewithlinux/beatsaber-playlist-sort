@@ -34,5 +34,6 @@ export const GET: RequestHandler = async ({ fetch, url }) => {
 	});
 	response.headers.set('age', '0');
 	response.headers.set('cache-control', `public, max-age=${15 * 60}`);
+	response.headers.set('content-disposition', `attachment; filename="${playlist_title}.bplist"`);
 	return response;
 };

@@ -85,8 +85,8 @@
 				playlist author:
 				<input bind:value={playlist_author} />
 			</label>
-			<!-- <a href={playlistDataURI} download="{playlist_title}.json"> click to download playlist </a> -->
-			<a href={playlistSyncURL} download="{playlist_title}.json"> click to download playlist </a>
+			<a href={playlistSyncURL} download="{playlist_title}.json">download</a>
+			<a href={`bsplaylist://playlist/${encodeURIComponent(playlistSyncURL)}`}>one-click</a>
 		</div>
 		<div class="row">
 			<button on:click={() => columnApi?.autoSizeAllColumns()}>autoSizeAllColumns</button>
