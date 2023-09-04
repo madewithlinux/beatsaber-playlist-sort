@@ -1,4 +1,4 @@
-import type { LeaderboardInfoResponse } from '../beatleader';
+import type { LeaderboardInfoResponse } from './beatleader';
 
 export type CharacteristicName = 'Standard';
 export type DifficultyName = 'Normal' | 'Easy' | 'Hard' | 'Expert' | 'ExpertPlus';

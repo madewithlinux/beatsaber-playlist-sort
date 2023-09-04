@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types';
-import type { LeaderboardInfoResponseResponseWithMetadata } from '../../../beatleader';
+import type { LeaderboardInfoResponseResponseWithMetadata } from '$lib/beatleader';
 import type { BeatmapGridRow } from '$lib/BeatmapGrid.svelte';
 import { batch_apply_sort_weight } from '$lib/sort_weight_calc';
 import { generatePlaylistObject } from '$lib/generate_playlist';

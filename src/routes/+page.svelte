@@ -6,7 +6,7 @@
 	import { generatePlaylistDataURI } from '$lib/generate_playlist';
 	import { batch_apply_sort_weight } from '$lib/sort_weight_calc';
 	import type { ColumnApi, GridApi } from 'ag-grid-community';
-	import type { LeaderboardInfoResponse, LeaderboardInfoResponseResponseWithMetadata } from '../beatleader';
+	import type { LeaderboardInfoResponse, LeaderboardInfoResponseResponseWithMetadata } from '$lib/beatleader';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 

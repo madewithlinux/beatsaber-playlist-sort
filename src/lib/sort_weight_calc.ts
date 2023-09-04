@@ -1,5 +1,5 @@
 import { compile } from 'mathjs';
-import type { LeaderboardInfoResponse } from '../beatleader';
+import type { LeaderboardInfoResponse } from './beatleader';
 import type { BeatmapGridRow } from './BeatmapGrid.svelte';
 
 export type BeatmapSortWeightFunc = (leaderboardInfo: LeaderboardInfoResponse, failOnError?: boolean) => number;

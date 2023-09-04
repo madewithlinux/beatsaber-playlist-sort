@@ -1,20 +1,15 @@
-<script context="module" lang="ts">
-	import type { LeaderboardInfoResponse } from './beatleader';
-
-	export interface BeatmapGridRow {
-		leaderboardInfo: LeaderboardInfoResponse;
-		sortWeight: number;
-	}
-</script>
-
 <script lang="ts">
 	import type { ColDef, ColumnApi, GridApi, GridOptions } from 'ag-grid-community';
 	import 'ag-grid-community/styles/ag-grid.css';
 	import 'ag-grid-community/styles/ag-theme-balham.css';
 	import AgGridSvelte from 'ag-grid-svelte';
-	import { formatFixedDecimal, formatPercentage, mapperNameCellRenderer, songNameCellRenderer } from './grid_util';
+	import type { GenericBeatmapGridRow } from './GenericBeatmapGridLib';
+	import { fillGenericBeatmapGridRows } from './GenericBeatmapGridLib';
+	import { formatFixedDecimal, formatPercentage, mapperNameCellRenderer2, songNameCellRenderer2 } from './grid_util';
 
-	export let rowData: BeatmapGridRow[];
+	export let rowData: GenericBeatmapGridRow[];
+	$: filledRowData = fillGenericBeatmapGridRows(rowData ?? []);
+	// $: console.log((rowData ?? [])[0], (filledRowData ?? [])[0]);
 
 	//////// display options
 	export let songCoverImageEnabled = true;
@@ -31,85 +26,90 @@
 		},
 		{
 			headerName: 'name',
-			field: 'leaderboardInfo.song.name',
-			cellRenderer: songNameCellRenderer({ showCoverImage: songCoverImageEnabled }),
+			field: 'song.name',
+			cellRenderer: songNameCellRenderer2({ showCoverImage: songCoverImageEnabled }),
 		},
-		{ headerName: 'artist', field: 'leaderboardInfo.song.author', hide: !allColumns },
+		{ headerName: 'artist', field: 'song.author', hide: !allColumns },
 		{
 			headerName: 'mapper',
-			field: 'leaderboardInfo.song.mapper',
-			cellRenderer: mapperNameCellRenderer,
+			field: 'song.mapper',
+			cellRenderer: mapperNameCellRenderer2,
 			hide: !allColumns,
 		},
-		{ headerName: 'tags', field: 'leaderboardInfo.song.tags', hide: !allColumns },
-		{ headerName: 'diff', field: 'leaderboardInfo.difficulty.difficultyName' },
-		{ headerName: 'mode', field: 'leaderboardInfo.difficulty.modeName', hide: !allColumns },
+		{ headerName: 'tags', field: 'song.tags', hide: !allColumns },
+		{ headerName: 'diff', field: 'difficultyDescription.difficultyName' },
+		{ headerName: 'mode', field: 'difficultyDescription.modeName', hide: !allColumns },
 		{
 			headerName: 'nps',
-			field: 'leaderboardInfo.difficulty.nps',
+			field: 'difficultyDescription.nps',
 			type: 'numericColumn',
 			valueFormatter: formatFixedDecimal(2),
 		},
-		{ headerName: 'njs', field: 'leaderboardInfo.difficulty.njs', type: 'numericColumn' },
-		{ headerName: 'duration', field: 'leaderboardInfo.difficulty.duration', type: 'numericColumn' },
+		{ headerName: 'njs', field: 'difficultyDescription.njs', type: 'numericColumn' },
+		{ headerName: 'duration', field: 'difficultyDescription.duration', type: 'numericColumn' },
 		{
 			headerName: 'maxScore',
-			field: 'leaderboardInfo.difficulty.maxScore',
+			field: 'difficultyDescription.maxScore',
 			type: 'numericColumn',
 			hide: !allColumns,
 		},
 		{
 			headerName: 'predictedAcc',
-			field: 'leaderboardInfo.difficulty.predictedAcc',
+			field: 'difficultyDescription.predictedAcc',
 			type: 'numericColumn',
 			valueFormatter: formatPercentage,
 			hide: !allColumns,
 		},
 		{
 			headerName: '★stars★',
-			field: 'leaderboardInfo.difficulty.stars',
+			field: 'difficultyDescription.stars',
 			type: 'numericColumn',
 			valueFormatter: formatFixedDecimal(2),
 		},
 		{
 			headerName: '★pass★',
-			field: 'leaderboardInfo.difficulty.passRating',
+			field: 'difficultyDescription.passRating',
 			type: 'numericColumn',
 			valueFormatter: formatFixedDecimal(2),
 		},
 		{
 			headerName: '★acc★',
-			field: 'leaderboardInfo.difficulty.accRating',
+			field: 'difficultyDescription.accRating',
 			type: 'numericColumn',
 			valueFormatter: formatFixedDecimal(2),
 		},
 		{
 			headerName: '★tech★',
-			field: 'leaderboardInfo.difficulty.techRating',
+			field: 'difficultyDescription.techRating',
 			type: 'numericColumn',
 			valueFormatter: formatFixedDecimal(2),
 		},
-		{ headerName: 'notes', field: 'leaderboardInfo.difficulty.notes', type: 'numericColumn' },
-		{ headerName: 'bombs', field: 'leaderboardInfo.difficulty.bombs', type: 'numericColumn' },
-		{ headerName: 'walls', field: 'leaderboardInfo.difficulty.walls', type: 'numericColumn' },
+		{ headerName: 'notes', field: 'difficultyDescription.notes', type: 'numericColumn' },
+		{ headerName: 'bombs', field: 'difficultyDescription.bombs', type: 'numericColumn' },
+		{ headerName: 'walls', field: 'difficultyDescription.walls', type: 'numericColumn' },
 		{
 			headerName: 'uploadTime',
-			field: 'leaderboardInfo.song.uploadTime',
+			field: 'song.uploadTime',
 			hide: !allColumns,
 		},
 		{
 			headerName: 'nominatedTime',
-			field: 'leaderboardInfo.difficulty.nominatedTime',
+			field: 'difficultyDescription.nominatedTime',
 			hide: !allColumns,
 		},
 		{
 			headerName: 'qualifiedTime',
-			field: 'leaderboardInfo.difficulty.qualifiedTime',
+			field: 'difficultyDescription.qualifiedTime',
 			hide: !allColumns,
 		},
 		{
 			headerName: 'rankedTime',
-			field: 'leaderboardInfo.difficulty.rankedTime',
+			field: 'difficultyDescription.rankedTime',
+			hide: !allColumns,
+		},
+		{
+			headerName: 'timepost',
+			field: 'scoreResponse.timepost',
 			hide: !allColumns,
 		},
 	];
@@ -128,14 +128,14 @@
 	<div class="AgGridSvelte-theme-container ag-grid ag-theme-balham">
 		<AgGridSvelte
 			{columnDefs}
-			{rowData}
+			rowData={filledRowData}
 			bind:api
 			bind:columnApi
 			{gridOptions}
 			onGridReady={({ columnApi }) => {
 				columnApi.autoSizeAllColumns();
 				// by default, don't make the song name super wide like that
-				columnApi.setColumnWidth('leaderboardInfo.song.name', 200);
+				columnApi.setColumnWidth('song.name', 200);
 			}}
 		/>
 	</div>
